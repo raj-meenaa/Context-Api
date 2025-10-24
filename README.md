@@ -1,10 +1,10 @@
 # React Context API Examples
 
-A comprehensive collection of React Context API implementation examples demonstrating state management patterns in modern React applications. This repository contains two practical projects showcasing different use cases of Context API for managing global state without external libraries.
+A comprehensive collection of React Context API implementation examples demonstrating state management patterns in modern React applications. This repository contains three practical projects showcasing different use cases of Context API for managing global state without external libraries.
 
 ## Project Description
 
-This repository serves as a learning resource for developers looking to understand and implement React's Context API. It features two fully functional examples that demonstrate how to use Context API for different real-world scenarios: user authentication state management and theme switching functionality. Each example is built with React 19, Vite, and follows modern React best practices.
+This repository serves as a learning resource for developers looking to understand and implement React's Context API. It features three fully functional examples that demonstrate how to use Context API for different real-world scenarios: user authentication state management, theme switching functionality, and todo list management with persistent storage. Each example is built with React 19, Vite, and follows modern React best practices.
 
 ## Features
 
@@ -89,7 +89,66 @@ useEffect(() => {
 }, [themeMode]);
 ```
 
-### 3. React 19 and Modern Tooling
+### 3. Todo App with LocalStorage (localStorage)
+
+**What it does:**
+- Implements a fully functional todo application with persistent data storage
+- Manages todo items with add, update, delete, and complete/uncomplete functionality
+- Stores todos in browser's localStorage to persist data across sessions
+- Provides a clean UI with visual feedback for completed tasks
+
+**How it works:**
+- Creates a `TodoContext` using `createContext()` with todo state and CRUD operations
+- Exports a custom `useTodo` hook for easy context consumption
+- Uses a `TodoProvider` to wrap the application and distribute todo state and functions
+- Implements localStorage integration via `useEffect` hooks for data persistence
+- Loads existing todos from localStorage on app initialization
+- Automatically saves todos to localStorage whenever the todo list changes
+
+**How to use:**
+1. The `TodoProvider` wraps the application and provides `todos`, `addTodo`, `deleteTodo`, `updateTodo`, and `completeTodo` functions
+2. The `TodoForm` component captures user input and calls `addTodo()` to create new todos
+3. The `TodoItem` component displays each todo with options to edit, delete, or mark as complete
+4. Behind the scenes:
+   - When user adds a todo, `addTodo()` creates a new todo object with unique ID (timestamp) and adds it to the state
+   - When user toggles completion, `completeTodo()` updates the `isCompleted` property
+   - When user edits a todo, `updateTodo()` replaces the old todo with updated content
+   - When user deletes a todo, `deleteTodo()` filters it out from the array
+   - A `useEffect` hook with empty dependency array runs once on mount to load todos from localStorage
+   - Another `useEffect` hook watches the `todos` state and saves to localStorage on every change
+   - Completed todos display with a strikethrough and different background color
+
+**Technical implementation:**
+```javascript
+// Context creation with default structure
+export const TodoContext = createContext({
+  todos: [{ id: 1, msg: "todo msg", isCompleted: false }],
+  addTodo: (todo) => {},
+  updateTodo: (id, todo) => {},
+  deleteTodo: (id) => {},
+  completeTodo: (id) => {}
+});
+
+// Custom hook for consuming todos
+export const useTodo = () => {
+  return useContext(TodoContext);
+};
+
+// Load from localStorage on mount
+useEffect(() => {
+  const result = JSON.parse(localStorage.getItem("todos"));
+  if (result && result.length > 0) {
+    setTodos(result);
+  }
+}, []);
+
+// Save to localStorage on changes
+useEffect(() => {
+  localStorage.setItem("todos", JSON.stringify(todos));
+}, [todos]);
+```
+
+### 4. React 19 and Modern Tooling
 
 **What it does:**
 - Utilizes the latest React 19 features for optimal performance
@@ -137,21 +196,38 @@ Context-Api/
 │   ├── package.json            # Project dependencies (includes Tailwind CSS)
 │   └── vite.config.js          # Vite configuration
 │
+├── localStorage/                # Todo App with LocalStorage Example
+│   ├── src/
+│   │   ├── components/         # React components
+│   │   │   ├── TodoForm.jsx   # Input form for adding new todos
+│   │   │   ├── TodoItem.jsx   # Individual todo item with edit/delete/complete actions
+│   │   │   └── index.js       # Component exports
+│   │   ├── context/           # Context API implementation
+│   │   │   ├── TodoContext.js # Todo context, provider, and custom hook
+│   │   │   └── index.js       # Context exports
+│   │   ├── App.jsx            # Main app with todo provider and localStorage integration
+│   │   └── main.jsx           # Application entry point
+│   ├── package.json           # Project dependencies (includes Tailwind CSS)
+│   └── vite.config.js         # Vite configuration
+│
 └── README.md                    # This file - comprehensive documentation
 ```
 
 ### Key Files Explained
 
 **Context Files:**
-- `UserContext.js` / `theme.js`: Core context objects that create the global state container
+- `UserContext.js` / `theme.js` / `TodoContext.js`: Core context objects that create the global state container
 - `UserContextProvider.jsx`: Wrapper component that manages and provides user authentication state
 - `theme.js`: Contains context, provider export, and custom `useTheme` hook for simplified consumption
+- `TodoContext.js`: Contains context, provider export, and custom `useTodo` hook with todo CRUD operations
 
 **Component Files:**
 - `Login.jsx`: Captures user credentials and updates context state on submission
 - `Profile.jsx`: Reads user state from context and conditionally renders content
 - `ThemeBtn.jsx`: Interactive toggle switch that triggers theme changes in context
 - `Card.jsx`: Example component demonstrating theme-responsive styling with Tailwind
+- `TodoForm.jsx`: Input form component that captures new todo text and adds to context state
+- `TodoItem.jsx`: Displays individual todo with inline editing, completion toggle, and delete functionality
 
 **Configuration Files:**
 - `package.json`: Lists all dependencies (React 19, Vite, ESLint, Tailwind for themeSwitcher)
@@ -186,6 +262,13 @@ npm install
 npm run dev
 ```
 
+4. Install dependencies for Todo with LocalStorage example:
+```bash
+cd localStorage
+npm install
+npm run dev
+```
+
 ### Available Scripts
 
 Each project includes the following npm scripts:
@@ -214,12 +297,15 @@ By exploring these examples, you will learn:
 2. **State Management Patterns**
    - Managing authentication state without prop drilling
    - Implementing theme preferences across an application
+   - Handling complex state with CRUD operations (Create, Read, Update, Delete)
+   - Persisting state to browser localStorage for data persistence
    - Creating custom hooks for cleaner context consumption
 
 3. **React Best Practices**
    - Component composition and separation of concerns
-   - Using effects for side effects (DOM manipulation)
+   - Using effects for side effects (DOM manipulation, localStorage integration)
    - Conditional rendering based on global state
+   - Managing multiple related state operations efficiently
 
 4. **Modern React Development**
    - Working with React 19 features

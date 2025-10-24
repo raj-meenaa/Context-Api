@@ -3,7 +3,7 @@ import { createContext, useContext } from 'react'
 
 
 export const themeContext=createContext({
-    themeMode: "loght",
+    themeMode: "light",
     darkMode: ()=>{},
     lightMode: ()=>{},
 });
